@@ -1,39 +1,5 @@
 # BE RESEAU
-## TPs BE Reseau - 3 MIC
-
-Les détails du sujet du BE est accessible depuis le cours "Programmation Système et Réseau" sur moodle.
-
-
-## Contenu du dépôt « template » fourni
-Ce dépôt inclut le code source initial fourni pour démarrer le BE. Plus précisément : 
-  - README.md (ce fichier) qui notamment décrit la préparation de l’environnement de travail et le suivi des versions de votre travail; 
-  - tsock_texte et tsock_video : lanceurs pour les applications de test fournies. 
-  - dossier include : contenant les définitions des éléments fournis que vous aurez à manipuler dans le cadre du BE.
-  - dossier src : contenant l'implantation des éléments fournis et à compléter dans le cadre du BE.
-  - src/mictcp.c : fichier au sein duquel vous serez amenés à faire l'ensemble de vos contributions (hors bonus éventuels). 
-
-
-## Création du dépôt mictcp 
-
-1. Création d’un compte git étudiant : Si vous ne disposez pas d’un compte git, connectez vous sur http://github.com/ et créez un compte par binôme. 
-
-2. Afin d’être capable de mettre à jour le code que vous aurez produit sur le dépôt central Github, il vous faudra créer un jeton d’accès qui jouera le rôle de mot de passe. Veuillez le sauvegarder, car il vous le sera demandé lors de l'accès au dépôt central. Pour ce faire, veuillez suivre les étapes décrites : https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-
-3. Création d’un dépôt Etudiant sur GitHub pour le BE Reseau
-  
-   Créer une copie du dépôt template enseignant : https://github.com/rezo-insat/mictcp, en vous y rendant et en cliquant sur le bouton « use this template » situé dans le coin en haut, plutôt à droite de la page. Il est demandé de le choisir comme dépôt privé. Il est impératif pour les corrections que vous rajoutiez le compte : rezo-insat comme collaborateur afin de permettre à vos enseignants d'accéder à votre dépôt. Pour ce faire, sélectionner le bouton "settings" puis "collaborators" et rajouter comme utilisateur : rezo-insat. La marche à suivre est décrite ci-après : https://docs.github.com/en/organizations/managing-access-to-your-organizations-repositories/adding-outside-collaborators-to-repositories-in-your-organization
-
-
-4. Créer un clone local de votre dépôt Github, i.e. une copie locale du dépôt sur votre compte insa. 
-  
-    cliquer sur le bouton « code » de votre dépôt, copier l’URL qui permet de l’identifier. 
-	Ouvrir un terminal de votre machine. En vous plaçant dans le répertoire de travail de votre choix, taper depuis le terminal :
-
-        git clone <url de votre dépôt>
-
-    Vous avez désormais une copie locale de votre dépôt, que vous pouvez mettre à jour et modifier à volonté au gré de votre avancement sur les TPs. 
-
-5. Afin de nous permettre d’avoir accès à votre dépôt, merci de bien vouloir renseigner l'URL de votre dépôt sur le fichier accessible depuis le lien "fichier URLs dépôts étudiants" se trouvant sur moodle (au niveau de la section: BE Reseau).
+## TPs BE Reseau - 3 MIC-E : Mathis Morra-Fischer & Efe Inkaya
 
 ## Compilation du protocole mictcp et lancement des applications de test fournies
 
@@ -48,42 +14,34 @@ Deux applicatoins de test sont fournies, tsock_texte et tsock_video, elles peuve
 
 Seul tsock_video permet d'utiliser, au choix, votre protocole mictcp ou une émulation du comportement de tcp sur un réseau avec pertes.
 
-## Suivi de versions de votre travail
+## Ce qui fonctionne et ne fonctionne pas
 
-Vous pouvez travailler comme vous le souhaitez sur le contenu du répertoire local. Vous pouvez mettre à jour les fichiers existants, rajouter d’autres ainsi que des dossiers et en retirer certains à votre guise. 
+Tous fonctionne correctement.
 
-Pour répercuter les changements que vous faites sur votre répertoire de travail local sur le dépôt central GitHub, sur votre terminal, taper :
- 
-    git add .
-    git commit -m «un message décrivant la mise à jour»
-    git push
-
-- Marquage des versions successives de votre travail sur mictcp 
- 
-Lorsque vous le souhaitez, git permet d'associer une étiquette à un état précis de votre dépôt par l'intermédiaires de tags. Il vous est par exemple possible d'utiliser ce mécanisme pour marquer (et par conséquence pouvoir retrouver) l'état de votre dépôt pour chacune des versions successives de votre travail sur mictcp.
-
-Pour Créer un tag « v1 » et l'associer à l'état courrant de votre dépôt, vous taperez la commande suivante sur votre terminal :
-
-    git tag v1
-
-Pour lister les tags existants au sein de votre dépôt
-
-    git tag -l
-
-Pour transférer les tags de votre dépôt local vers le dépôt central sur github:
-
-    git push origin --tags
-
-
-Ceci permettra à votre enseignant de positionner le dépôt dans l'état ou il était au moment du marquage avec chacun des tags que vous définissez. 
    
-## Suivi de votre avancement 
+## Choix d'implémentation
 
-Veuillez utiliser, à minima, un tag pour chacune des versions successives de mictcp qui sont définies au sein du sujet du BE disponible sous moodle.
+### Stop-and-Wait avec fiabilité partielle
 
+Nous avons choisi d’implémenter un protocole de type stop-and-wait, adapté pour la fiabilité partielle. À chaque envoi de PDU, l’émetteur attend un ACK correspondant avant de passer au suivant. Si l’ACK n’arrive pas, le PDU est retransmis, sauf si le taux de pertes toléré est atteint.
 
-## Liens utiles 
+Pour mesurer ce taux de pertes, nous utilisons une fenêtre glissante de taille fixe (définie par `TAILLE_FENETRE`). Cette fenêtre est implémentée comme un buffer circulaire qui enregistre le succès ou l’échec des derniers envois. Cela permet de calculer dynamiquement le taux de pertes sur les transmissions récentes, ce qui évite d’accepter trop d’erreurs consécutives et améliore la qualité de service, notamment pour la vidéo.
 
-Aide pour la création d’un dépôt depuis un template : https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template
+### Négociation du taux de pertes
 
-Manuel d'utilisation de git: https://git-scm.com/docs
+Lors de l’établissement de la connexion, le client et le serveur proposent chacun un taux de pertes maximal acceptable (respectivement `CLIENT_LOSS_RATE` et `SERVER_LOSS_RATE`). Le serveur choisit la valeur la plus contraignante (la plus faible) et l’applique pour la session. Ce choix garantit que la contrainte la plus stricte est respectée des deux côtés.
+
+### Gestion de la connexion (SYN, SYN-ACK, ACK)
+
+La connexion suit un schéma inspiré de TCP : le client envoie un SYN, le serveur répond par un SYN-ACK, puis le client termine avec un ACK. Nous avons ajouté une gestion robuste des duplications et pertes de paquets :  
+- Le serveur renvoie un SYN-ACK à chaque SYN reçu (même dupliqué).
+- Le client renvoie un ACK à chaque SYN-ACK reçu (même dupliqué), ce qui permet de gérer la perte de paquets lors de l’établissement de la connexion.
+
+### Asynchronisme serveur
+
+Pour gérer l’asynchronisme entre le thread applicatif (accept) et le thread réceptif (réception des PDU), nous utilisons un mutex et une variable de condition (`pthread_cond_t`). Le thread applicatif reste bloqué dans `mic_tcp_accept` tant qu’aucune connexion n’est établie, et il est réveillé par le thread réceptif dès qu’un ACK de connexion est reçu.
+
+## Bénéfices de notre MICTCP-v4.2
+
+Notre version de MICTCP permet une fiabilité partielle configurable, ce qui est particulièrement adapté aux applications multimédia (vidéo, audio temps réel) où la fluidité prime sur la fiabilité absolue. En tolérant un certain taux de pertes, on évite les blocages et les délais dus aux retransmissions systématiques, ce qui améliore l’expérience utilisateur par rapport à TCP ou à une version de MICTCP-v2 sans gestion fine des pertes.
+
